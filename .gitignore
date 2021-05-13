@@ -3,7 +3,7 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,visualstudiocode,node
 
 # Secret
-db-config.json
+config/
 
 ### macOS ###
 # General
