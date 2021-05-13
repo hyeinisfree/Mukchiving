@@ -17,8 +17,8 @@ router.get('/', (req, res) =>  {
   res.send(req.body);
 });
 
-router.post('/', passport.authenticate('jwt', { session: false }),
-  async (req, res, next) => {
+router.post('/', passport.authenticate('jwt', { session: false }), 
+  (req, res, next) => {
     try {
       res.json({result:true});
     } catch (e) {
@@ -69,5 +69,16 @@ router.post('/register/checkId');
 router.post('/register/checkPhone');
 
 router.post('/register/checkPassword');
+
+router.get('/logout', passport.authenticate('jwt', { session: false }), 
+  (req, res, next) => {
+    try {
+      req.logout();
+    } catch (e) {
+      console.log(e);
+      next(e);
+    }
+  }
+);
 
 module.exports = router;
