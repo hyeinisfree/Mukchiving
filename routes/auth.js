@@ -48,7 +48,8 @@ router.post('/login', async (req, res, next) => {
 		    // 클라이언트에게 JWT생성 후 반환
         const token = jwt.sign(
           { user_id: user.user_id },
-          'jwt-secret-key'
+          'jwt-secret-key',
+          {expiresIn: "7d"}
         );
         res.json({ token });
       });
