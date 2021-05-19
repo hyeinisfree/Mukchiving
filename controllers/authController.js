@@ -1,6 +1,5 @@
 var express = require('express');
-var router = express.Router();
-var db = require('./../db');
+var db = require('../db');
 var conn = db.init();
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
@@ -15,83 +14,64 @@ const axios = require('axios');
 
 db.connect(conn);
 
-router.get('/', (req, res) =>  {
-  res.send(req.body);
-});
+const { authService } = require('../services');
 
-router.post('/', passport.authenticate('jwt', { session: false }), 
-  (req, res, next) => {
-    try {
-      res.json({result:true});
-    } catch (e) {
-      console.log(e);
-      next(e);
-    }
-  }
-);
-
-router.post('/login', async (req, res, next) => {
+const login =  async (req, res, next) => {
   try {
 		// 아까 local로 등록한 인증과정 실행
     passport.authenticate('local', { session: false }, (err, user) => {
 			// 인증이 실패했거나 유저 데이터가 없다면 에러 발생
       if (err || !user) {
         console.log(err);
-        res.status(400).json({ message: err });
-        return;
+        return res.status(400).json({success : false, message : "로그인 실패"});
       }
-			// user데이터를 통해 로그인 진행
+			// user 데이터를 통해 로그인 진행
       req.login(user, { session: false }, (err) => {
         if (err) {
           console.log(err);
-          res.send(err);
-          return;
+          return res.send(err);
         }
 		    // 클라이언트에게 JWT생성 후 반환
         const token = jwt.sign(
-          { user_id: user.user_id },
+          { user_id : user.user_id },
           'jwt-secret-key',
           {expiresIn: "7d"}
         );
-        res.json({ token });
+        return res.json({ success : true, message : "로그인 성공", token });
       });
     })(req, res);
   } catch (e) {
     console.error(e);
-    next(e);
+    return next(e);
   }
-});
+};
 
-router.post('/checkUsername', (req, res) => {
+const checkUsername = (req, res) => {
   var username = req.body.username;
-  var sql = 'select * from user where username = ?';
-  var params = [username];
-  conn.query(sql, params, function (err, rows, fields) {
-    if(err) {
-      console.log(err);
-    }
-    if(rows) res.send({check:false});
-    res.send({check:true});
-  }) 
-});
+  const data = authService.checkUsername(username, function(err, data) {
+    if(data) return res.status(400).json({success:false, message:"해당 닉네임이 이미 존재합니다."});
+    return res.json({success:true, message:"이 닉네임은 사용 가능합니다."});
+  });
+};
 
-router.post('/checkId', (req, res) => {
+const checkId = (req, res) => {
   var user_id = req.body.user_id;
-  var sql = 'select * from user where user_id = ?';
-  var params = [user_id];
-  conn.query(sql, params, function (err, rows, fields) {
-    if(err) {
-      console.log(err);
-    }
-    if(rows) res.send({check:false});
-    res.send({check:true});
-  }) 
-});
+  const data = authService.checkId(user_id, function(err, data) {
+    if(data) return res.status(400).json({success:false, message:"해당 아이디가 이미 존재합니다."});
+    return res.json({success:true, message:"이 아이디는 사용 가능합니다."});
+  }); 
+};
 
-router.post('/sendAuthNumber', async (req, res) => {
+const sendAuthNumber =  async (req, res) => {
   var phone = req.body.phone;
-  var auth_number = req.body.auth_number;
+  var auth_number = '';
   var resultCode = 404;
+
+  for(var i=0; i<6; i++) {
+    var rnum = Math.floor(Math.random() * 10);
+    auth_number += rnum;
+  }
+  console.log(auth_number);
 
   const accessKey = 'rKFKX9FhZBZz8UUOGOn8';
   const secretKey = 'BxmlIkcd5LsYp406VisBMB3FltpZ6oVgYaNi6zOy';
@@ -137,7 +117,7 @@ router.post('/sendAuthNumber', async (req, res) => {
     }  
   }
   await axios.post(url, body, options)
-  .then(async (res) =>  {
+  .then((res) =>  {
     resultCode = 200;
   })
   .catch((error) => {
@@ -152,10 +132,11 @@ router.post('/sendAuthNumber', async (req, res) => {
     }
     console.log(error.config);
   });
-  res.json({'code' : resultCode});
-});
+  if(resultCode == 200) return res.status(resultCode).json({success: true, message: "인증 번호 전송 성공", auth_number: auth_number});
+  else return res.status(resultCode).json({success: false, message: "인증 번호 전송 실패"});
+};
 
-router.post('/register', async (req, res) => {
+const signup =  async (req, res) => {
   var user_id = req.body.user_id;
   var password = req.body.password;
   var phone = req.body.phone;
@@ -167,59 +148,40 @@ router.post('/register', async (req, res) => {
   var params1 = [user_id, hash, phone];
 
   conn.query(sql1, params1, async function (err, rows, fields) {
-    if(err) throw err;
-    console.log("1 record inserted");
+    if(err) {
+      return res.status(400).json({success: false, message: "회원 DB 생성에 실패하였습니다."});
+    }
+    console.log("user table 1 record inserted");
 
     var sql2 = 'insert into profile (user_id, username) values (?, ?)';
     var params2 = [user_id, username];
     await conn.query(sql2, params2, function (err, rows, fiedls) {
-      if(err) throw err;
-      console.log("1 record inserted");
+      if(err) {
+        var sql3 = 'delete from user where user_id = ?';
+        var params3 = [user_id];
+        conn.query(sql3, params3, function (err, rows, fiedls) {
+          if(err) {
+            return next(err);
+          }
+          console.log("user table 1 record deleted");
+        })
+        return res.status(400).json({success: false, message: "프로필 DB 생성에 실패하였습니다."});
+      }
+      console.log("profile table 1 record inserted");
+      return res.status(201).json({success: true, message: "회원 DB 및 프로필 DB가 정상적으로 생성되었습니다."});
     });
-    return res.status(200).json({success: 'true'});
   }); 
-});
+};
 
-router.get('/check', (req, res) => {
-  // 인증 확인
-  const token = req.headers.authorization.split('Bearer ')[1];
-  let jwt_secret = 'jwt-secret-key';
+const check =  (req, res) => {
+  res.json(req.decoded);
+};
 
-  if (!token) {
-    res.status(400).json({
-      'status': 400,
-      'msg': 'Token 없음'
-    });
-  }
-  const checkToken = new Promise((resolve, reject) => {
-    jwt.verify(token, jwt_secret, function (err, decoded) {
-      if (err) reject(err);
-      resolve(decoded);
-    });
-  });
-
-  checkToken.then(
-    token => {
-      console.log(token);
-      res.status(200).json({
-        'status': 200,
-        'msg': 'success',
-        token
-      });
-    }
-  )
-});
-
-router.post('/logout', passport.authenticate('jwt', { session: false }), 
-  (req, res) => {
-    try {
-      req.logout();
-      res.send('hello');
-    } catch (e) {
-      console.log(e);
-      next(e);
-    }
-  }
-);
-
-module.exports = router;
+module.exports = {
+  login,
+  checkUsername,
+  checkId,
+  sendAuthNumber,
+  signup,
+  check,
+};
