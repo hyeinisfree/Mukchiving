@@ -24,8 +24,10 @@ passportConfig();
 
 app.use(routes);
 
-app.get('/', (req, res) => {
+app.post('/', (req, res) => {
   var title = req.body.title;
+  console.log(req.body);
+  console.log(title);
   res.json({message : "Request Test Success", title : title});
 })
 
