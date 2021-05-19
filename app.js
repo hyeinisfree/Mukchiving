@@ -25,7 +25,8 @@ passportConfig();
 app.use(routes);
 
 app.get('/', (req, res) => {
-  res.send('Hello World!')
+  var title = req.body.title;
+  res.json({message : "Request Test Success", title : title});
 })
 
 // catch 404 and forward to error handler
