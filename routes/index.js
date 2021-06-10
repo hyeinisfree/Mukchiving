@@ -6,7 +6,7 @@ const profileRouter = require('./profileRouter');
 const mypageRouter = require('./mypageRouter');
 
 router.use('/auth', authRouter);
-router.usr('/mypage', mypageRouter);
+router.use('/mypage', mypageRouter);
 router.use('/users', userRouter);
 router.use('/profile', profileRouter);
 
