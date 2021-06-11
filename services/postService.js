@@ -3,6 +3,19 @@ var db = require('../db');
 var conn = db.init();
 db.connect(conn);
 
+const userPost = function(user_id, callback){
+  var params = [user_id];
+  var sql = 'select * from post where user_id = ?;';
+  conn.query(sql, params, function (err, results) {
+    if(err) {
+      callback(err);
+      return;
+    }
+    callback(null, results);
+    return;
+  });
+};
+
 const createPost = function(data, callback) {
   console.log(data);
   var params = data;
@@ -41,6 +54,7 @@ const profileImage = function(user_id, callback) {
 }
 
 module.exports = {
+  userPost,
   createPost,
   detailPost,
   profileImage
