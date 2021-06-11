@@ -16,6 +16,28 @@ const createPost = (req, res) => {
   })
 }
 
+const detailPost = (req, res) => {
+  var post_id = req.params.id;
+  const detailPost = postService.detailPost(post_id, function(err, results){
+    if(results[0]) {
+      var data = {
+        post: results[0],
+      };
+      var user_id = results[0].user_id;
+      const profileImage = postService.profileImage(user_id, function(err, results){
+        if(results[0]) {
+          data.profileImage = results[0];
+          return res.json({success: true, message: "포스트 상세 반환 성공", data: data});
+        }
+        return res.status(400).json({success: false, message: "포스트 상세 반환 실패"});
+      })
+    }
+    return res.status(400).json({success: false, message: "포스트 상세 반환 실패"});
+    
+  })
+}
+
 module.exports = {
   createPost,
+  detailPost
 }

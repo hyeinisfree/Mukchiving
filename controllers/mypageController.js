@@ -9,7 +9,7 @@ const info = (req, res) => {
   var user_id = req.params.id;
   console.log(user_id);
   const info = mypageService.getInfo(user_id, function(err, results) {
-    if(results) {
+    if(results[0]) {
       const result = {
         user_id : results[0][0].user_id,
         username : results[0][0].username,
