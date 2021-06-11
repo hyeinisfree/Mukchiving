@@ -3,16 +3,16 @@ var db = require('../db');
 var conn = db.init();
 db.connect(conn);
 
-const createFollow = function(data, callback) {
-  console.log(data);
-  var params = data;
-  var sql = 'insert into post(user_id, title, memo, location, score, created_at) values (?, ?, ?, ?, ?, now())';
+const createFollow = async function(data, callback) {
+  var params = data;  
+  var sql = 'insert into follow(follow_receiver, follow_sender, created_at, accept) values (?, ?, now(), ?)';
   conn.query(sql, params, function(err, results){
     if(err) {
       callback(err);
       return;
     }
     callback(null, results);
+    return;
   })
 }
 
