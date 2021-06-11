@@ -7,7 +7,8 @@ const db_info = {
   password : db_config.password,
   port : db_config.port,
   database : db_config.database,
-  multipleStatements: true
+  multipleStatements: true,
+  dateStirng: 'date'
 }
 
 const connection = mysql.createConnection(db_info);
