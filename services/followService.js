@@ -29,7 +29,21 @@ const createFollow = function(data, callback) {
   })
 }
 
+const unfollow = function(data, callback) {
+  var params = data;
+  var sql = 'delete from follow where follow_receiver = ? and follow_sender = ?';
+  conn.query(sql, params, function(err, results){
+    if(err) {
+      callback(err);
+      return;
+    }
+    callback(null, results);
+    return;
+  })
+}
+
 module.exports = {
   checkFollow,
-  createFollow
+  createFollow,
+  unfollow
 }
