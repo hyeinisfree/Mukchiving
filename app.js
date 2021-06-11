@@ -26,6 +26,8 @@ passportConfig();
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(express.json());
+
 app.use('/api/v1', routes);
 
 app.get('/test', (req, res) => {
