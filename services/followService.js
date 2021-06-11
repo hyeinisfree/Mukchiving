@@ -42,8 +42,36 @@ const unfollow = function(data, callback) {
   })
 }
 
+const followerList = function(user_id, callback) {
+  var params = [user_id];
+  var sql = 'select follow_sender from follow where follow_receiver = ?';
+  conn.query(sql, params, function(err, results){
+    if(err) {
+      callback(err);
+      return;
+    }
+    callback(null, results);
+    return;
+  })
+}
+
+const followingList = function(user_id, callback) {
+  var params = [user_id];
+  var sql = 'select follow_receiver from follow where follow_sender = ?';
+  conn.query(sql, params, function(err, results){
+    if(err) {
+      callback(err);
+      return;
+    }
+    callback(null, results);
+    return;
+  })
+}
+
 module.exports = {
   checkFollow,
   createFollow,
-  unfollow
+  unfollow,
+  followerList,
+  followingList
 }

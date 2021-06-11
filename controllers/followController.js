@@ -28,11 +28,11 @@ const createFollow = (req, res) => {
       var data = [receiver, sender, accept];
       const createFollow = followService.createFollow(data, function(err, results){
         if(err) return;
-        if(results) return res.json({success: true, message: "포스트 DB가 정상적으로 생성되었습니다."});
-        return res.status(400).json({success: false, message: "포스트 DB 생성에 실패하였습니다."});
+        if(results) return res.json({success: true, message: "팔로우 DB가 정상적으로 생성되었습니다."});
+        return res.status(400).json({success: false, message: "팔로우 DB 생성에 실패하였습니다."});
       })
     } else {
-      return res.json({success: false, message: "포스트 DB 생성에 실패하였습니다."});
+      return res.json({success: false, message: "팔로우 DB 생성에 실패하였습니다."});
     }
   })
 }
@@ -51,8 +51,46 @@ const unfollow = (req, res) => {
   })
 }
 
+const followerList = (req, res) => {
+  var user_id = req.params.id || req.decoded.user_id;
+  
+  const followerList = followService.followerList(user_id, function(err, results){
+    if(results) {
+      var list = [];
+      for(var i=0; i<results.length; i++) {
+        console.log(results[0].follow_sender);
+        list.push(results[i].follow_sender);
+      }
+      return res.json({success: true, message: "팔로워 목록 조회 성공", list: list});
+    } else {
+      return res.json({success: false, message: "팔로우 목록 조회 실패"});
+    }
+  })
+}
+
+
+
+const followingList = (req, res) => {
+  var user_id = req.params.id || req.decoded.user_id;
+  
+  const followingList = followService.followingList(user_id, function(err, results){
+    if(results) {
+      var list = [];
+      for(var i=0; i<results.length; i++) {
+        console.log(results[0].follow_receiver);
+        list.push(results[i].follow_receiver);
+      }
+      return res.json({success: true, message: "팔로워 목록 조회 성공", list: list});
+    } else {
+      return res.json({success: false, message: "팔로우 목록 조회 실패"});
+    }
+  })
+}
+
 module.exports = {
   checkFollow,
   createFollow,
-  unfollow
+  unfollow,
+  followerList,
+  followingList,
 }
