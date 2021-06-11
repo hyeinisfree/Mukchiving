@@ -68,10 +68,38 @@ const followingList = function(user_id, callback) {
   })
 }
 
+const followerInfo = function(array, callback) {
+  var params = array.join();
+  var sql = `select user_id, username, profile_image from profile where user_id in (${params})`;
+  conn.query(sql, function(err, results){
+    if(err) {
+      callback(err);
+      return;
+    }
+    callback(null, results);
+    return;
+  })
+}
+
+const followingInfo = function(array, callback) {
+  var params = array.join();
+  var sql = `select user_id, username, profile_image from profile where user_id in (${params})`;
+  conn.query(sql, function(err, results){
+    if(err) {
+      callback(err);
+      return;
+    }
+    callback(null, results);
+    return;
+  })
+}
+
 module.exports = {
   checkFollow,
   createFollow,
   unfollow,
   followerList,
-  followingList
+  followingList,
+  followerInfo,
+  followingInfo
 }
