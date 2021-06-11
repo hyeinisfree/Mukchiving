@@ -2,6 +2,20 @@ var express = require('express');
 
 var { userService, followService } = require('../services');
 
+const checkFollow = (req, res) => {
+  var receiver = req.params.id;
+  var sender = req.decoded.user_id;
+  var data = [receiver, sender];
+
+  const checkFollow = followService.checkFollow(data, function(err, results){
+    if(results[0]) {
+      return res.json({check: true, message: "팔로우 중인 사용자입니다."});
+    } else {
+      return res.json({check: false, message: "팔로우 중인 사용자가 아닙니다."});
+    }
+  })
+}
+
 // follow_receiver, follow_sender, created_at, accept
 const createFollow = (req, res) => {
   var receiver = req.params.id;
@@ -24,5 +38,6 @@ const createFollow = (req, res) => {
 }
 
 module.exports = {
+  checkFollow,
   createFollow
 }
