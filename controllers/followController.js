@@ -58,17 +58,20 @@ const followerList = (req, res) => {
     if(results) {
       var list = [];
       for(var i=0; i<results.length; i++) {
-        console.log(results[0].follow_sender);
-        list.push(results[i].follow_sender);
+        var user_id = JSON.stringify(results[i].follow_sender);
+        list.push(user_id);
       }
-      return res.json({success: true, message: "팔로워 목록 조회 성공", list: list});
+      const followerInfo = followService.followerInfo(list, function(err, results){
+        console.log(list);
+        console.log(results);
+        if(results) return res.json({success: true, message: "팔로워 목록 조회 성공", list: results});
+        else return res.json({success: false, message: "팔로워 목록 조회 실패"});
+      })
     } else {
-      return res.json({success: false, message: "팔로우 목록 조회 실패"});
+      return res.json({success: false, message: "팔로워 목록 조회 실패"});
     }
   })
 }
-
-
 
 const followingList = (req, res) => {
   var user_id = req.params.id || req.decoded.user_id;
@@ -77,12 +80,17 @@ const followingList = (req, res) => {
     if(results) {
       var list = [];
       for(var i=0; i<results.length; i++) {
-        console.log(results[0].follow_receiver);
-        list.push(results[i].follow_receiver);
+        var user_id = JSON.stringify(results[i].follow_receiver);
+        list.push(user_id);
       }
-      return res.json({success: true, message: "팔로워 목록 조회 성공", list: list});
+      const followingInfo = followService.followingInfo(list, function(err, results){
+        console.log(list);
+        console.log(results);
+        if(results) return res.json({success: true, message: "팔로잉 목록 조회 성공", list: results});
+        else return res.json({success: false, message: "팔로잉 목록 조회 실패"});
+      })
     } else {
-      return res.json({success: false, message: "팔로우 목록 조회 실패"});
+      return res.json({success: false, message: "팔로잉 목록 조회 실패"});
     }
   })
 }
