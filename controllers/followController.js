@@ -37,7 +37,22 @@ const createFollow = (req, res) => {
   })
 }
 
+const unfollow = (req, res) => {
+  var receiver = req.params.id;
+  var sender = req.decoded.user_id;
+  var data = [receiver, sender];
+
+  const unfollow = followService.unfollow(data, function(err, results){
+    if(results) {
+      return res.json({success: true, message: "팔로우 DB 삭제 성공"});
+    } else {
+      return res.json({success: false, message: "팔로우 DB 삭제 실패"});
+    }
+  })
+}
+
 module.exports = {
   checkFollow,
-  createFollow
+  createFollow,
+  unfollow
 }
