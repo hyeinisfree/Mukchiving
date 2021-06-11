@@ -24,7 +24,7 @@ const updateProfile = async (req, res, next) => {
       if(results[0]) return res.status(400).json({success:false, message:"해당 닉네임이 이미 존재합니다."});
       var data = [username, content, profile_image, user_id];
       const updateProfile = await profileService.updateProfile(data, function(err, results) {
-        if(results[0]) return res.json({success:true, message:"사용자 닉네임, 소개글, 프로필 사진 수정 성공"});
+        if(results) return res.json({success:true, message:"사용자 닉네임, 소개글, 프로필 사진 수정 성공"});
         return res.status(400).json({success:false, message:"사용자 프로필 수정 실패"});
       });
     });
