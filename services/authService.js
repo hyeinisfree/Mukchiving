@@ -8,6 +8,7 @@ const checkUsername = function (username, callback) {
   conn.query(sql, params, function (err, results) {
     if(err) {
       callback(err);
+      return;
     }
     callback(null, results[0]);
   }); 
@@ -19,6 +20,7 @@ const checkId = function (user_id, callback) {
   conn.query(sql, params, function (err, results) {
     if(err) {
       callback(err);
+      return;
     }
     callback(null, results[0]);
   })
