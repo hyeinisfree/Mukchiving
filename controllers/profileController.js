@@ -14,23 +14,20 @@ const getProfile = (req, res) => {
   });
 };
 
-const updateProfile = async (req, res, next) => {
-  var user_id = req.params.id;
-  if(req.decoded.user_id == user_id) {
-    var username = req.body.username;
+const updateProfile = (req, res, next) => {
+  var user_id = req.decoded.user_id;
+
+  var username = req.body.username;
     var content = req.body.content;
     var profile_image = req.body.profile_image;
-    const checkUsername = await authService.checkUsername(username, async function(err, results) {
-      if(results[0]) return res.status(400).json({success:false, message:"해당 닉네임이 이미 존재합니다."});
+    const checkUsername = authService.checkUsername(username, function(err, results) {
+      if(results) return res.status(400).json({success:false, message:"해당 닉네임이 이미 존재합니다."});
       var data = [username, content, profile_image, user_id];
-      const updateProfile = await profileService.updateProfile(data, function(err, results) {
+      const updateProfile = profileService.updateProfile(data, function(err, results) {
         if(results) return res.json({success:true, message:"사용자 닉네임, 소개글, 프로필 사진 수정 성공"});
-        return res.status(400).json({success:false, message:"사용자 프로필 수정 실패"});
+        return res.json({success:false, message:"사용자 프로필 수정 실패"});
       });
     });
-  } else {
-    return res.json({success:false, message:"프로필을 수정할 권한이 없습니다."});
-  }
 };
 
 const uploadProfileImage = (req, res, next) => {
