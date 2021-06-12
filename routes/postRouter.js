@@ -4,7 +4,7 @@ const router = express.Router();
 const { upload } = require('../s3');
 const { verifyToken } = require('../middleware/auth');
 
-router.get('/getId/:title', verifyToken, postController.getPostId);
+router.get('/getId/:title', verifyToken, postController.getPostIdByTitle);
 router.get('/user/:id', verifyToken, postController.userPost);
 router.get('/uploadImages', verifyToken, upload.array("images"), postController.uploadImages);
 router.post('/create', verifyToken, postController.createPost);

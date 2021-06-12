@@ -3,7 +3,7 @@ var db = require('../db');
 var conn = db.init();
 db.connect(conn);
 
-const getPostId = function(title, callback){
+const getPostIdByTitle = function(title, callback){
   var params = [title];
   var sql = 'select post_id from post where title = ?';
   conn.query(sql, params, function(err, results){
@@ -92,7 +92,7 @@ const detailPost = function(post_id, callback) {
       callback(err);
       return;
     }
-    callback(null, results)
+    callback(null, results);
   })
 }
 
@@ -104,7 +104,7 @@ const deletePost = function(post_id, callback) {
       callback(err);
       return;
     }
-    callback(null, results)
+    callback(null, results);
   })
 }
 
@@ -116,12 +116,36 @@ const userProfile = function(user_id, callback) {
       callback(err);
       return;
     }
-    callback(null, results)
+    callback(null, results);
+  })
+}
+
+const createTag = function(title, callback) {
+  var params = [title];
+  var sql = 'insert into tag(title) values (?)';
+  conn.query(sql, params, function(err, results){
+    if(err) {
+      callback(err);
+      return;
+    }
+    callback(null, results);
+  })
+}
+
+const getTagByTitle = function(title, callback) {
+  var params = [title];
+  var sql = 'select tag_id from tag where title = ?';
+  conn.query(sql, params, function(err, results){
+    if(err) {
+      callback(err);
+      return;
+    }
+    callback(null, results);
   })
 }
 
 module.exports = {
-  getPostId,
+  getPostIdByTitle,
   userPost,
   createPost,
   detailPost,
@@ -129,4 +153,6 @@ module.exports = {
   getPostImages,
   createPostImages,
   userProfile,
+  createTag,
+  getTagByTitle,
 }
