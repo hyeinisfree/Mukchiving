@@ -57,6 +57,7 @@ const createPost = (req, res, next) => {
         })
       }
     }
+    return res.json({success: true, message: "포스트 DB 생성 성공", post_id: results[0].post_id});
   })
 }
 
