@@ -53,11 +53,10 @@ const createPost = (req, res, next) => {
             })
             return res.status(400).json({success: false, message: "포스트 이미지 DB 생성에 실패하였습니다."});
           } 
-          return res.status(201).json({success: true, message: "포스트 DB 및 포스트 이미지 DB가 정상적으로 생성되었습니다."});
+          return res.status(201).json({success: true, message: "포스트 DB 및 포스트 이미지 DB가 정상적으로 생성되었습니다.", post_id: post_id});
         })
-      }
+      } else return res.json({success: true, message: "포스트 DB 생성 성공", post_id: results[0].post_id});
     }
-    return res.json({success: true, message: "포스트 DB 생성 성공", post_id: results[0].post_id});
   })
 }
 
