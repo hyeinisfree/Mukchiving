@@ -53,7 +53,6 @@ const checkUsername = (req, res) => {
 const checkId = (req, res) => {
   var user_id = req.params.id;
   const data = authService.checkId(user_id, function(err, data) {
-    console.log(data);
     if(data) return res.status(400).json({success:false, message:"해당 아이디가 이미 존재합니다."});
     else return res.json({success:true, message:"이 아이디는 사용 가능합니다."});
   }); 
@@ -134,6 +133,7 @@ const sendAuthNumber =  async (req, res) => {
 };
 
 const signup =  async (req, res) => {
+  console.log(req.body);
   var user_id = req.body.user_id;
   var password = req.body.password;
   var phone = req.body.phone;
