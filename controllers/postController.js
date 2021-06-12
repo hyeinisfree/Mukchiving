@@ -5,6 +5,7 @@ var conn = db.init();
 
 const uploadImages = (req, res, next) => {
   const profile_images = req.files;
+  console.log(profile_images);
   var location = [];
   for(var i=0; i<profile_images.length; i++) {
     location.push(profile_images[i].location);
