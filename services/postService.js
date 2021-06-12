@@ -29,7 +29,7 @@ const userPost = function(user_id, callback){
   });
 };
 
-const postImages = function(image_data, callback) {
+const createPostImages = function(image_data, callback) {
   var post_id = image_data.post_id;
   var images = image_data.images
   var sqls = "";
@@ -44,6 +44,18 @@ const postImages = function(image_data, callback) {
   }
   console.log(sqls);
   conn.query(sqls, function(err, results){
+    if(err) {
+      callback(err);
+      return;
+    }
+    callback(null, results);
+  })
+}
+
+const getPostImages = function(post_id, callback) {
+  var params = [post_id];
+  var sql = 'select image_url from post_images where post_id = ?';
+  conn.query(sql, params, function(err, results){
     if(err) {
       callback(err);
       return;
@@ -96,9 +108,9 @@ const deletePost = function(post_id, callback) {
   })
 }
 
-const profileImage = function(user_id, callback) {
+const userProfile = function(user_id, callback) {
   var params = [user_id];
-  var sql = 'select profile_image from profile where user_id = ?';
+  var sql = 'select user_id, profile_image from profile where user_id = ?';
   conn.query(sql, params, function(err, results){
     if(err) {
       callback(err);
@@ -114,6 +126,7 @@ module.exports = {
   createPost,
   detailPost,
   deletePost,
-  postImages,
-  profileImage
+  getPostImages,
+  createPostImages,
+  userProfile,
 }

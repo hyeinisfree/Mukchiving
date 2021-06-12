@@ -45,7 +45,7 @@ const createPost = (req, res, next) => {
         var image_data = {};
         image_data.post_id = post_id;
         image_data.images = images;
-        const postImages = await postService.postImages(image_data, function(err, results){
+        const createPostImages = await postService.createPostImages(image_data, function(err, results){
           console.log(results);
           if(err) {
             const deletePost = postService.deletePost(post_id, function(err, results){
@@ -69,13 +69,23 @@ const detailPost = (req, res) => {
         post: results[0],
       };
       var user_id = results[0].user_id;
-      const profileImage = postService.profileImage(user_id, function(err, results){
+      const userProfile = postService.userProfile(user_id, function(err, results){
         console.log(results);
         if(results[0]) {
-          data.profileImage = results[0];
-          return res.json({success: true, message: "포스트 상세 반환 성공", data: data});
-        }
-        return res.status(400).json({success: false, message: "포스트 상세 반환 실패"});
+          data.user_profile = results[0];
+          const getPostImages = postService.getPostImages(post_id, function(err, results){
+            if(results) {
+              var post_images = [];
+              for(var i=0; i<results.length; i++) {
+                post_images.push(results[i].image_url);
+              }
+              data.post_images = post_images;
+              return res.json({success: true, message: "포스트 상세 반환 성공", data: data});
+            } else {
+              return res.json({success: true, message: "포스트 상세 반환 성공", data: data});
+            }
+          })
+        } else return res.status(400).json({success: false, message: "포스트 상세 반환 실패"});
       })
     } else {
       return res.status(400).json({success: false, message: "포스트 상세 반환 실패"});
