@@ -20,8 +20,9 @@ const info = (req, res) => {
         following : results[3][0].following,
       };
       return res.json({success:true, message:"해당 유저 정보 반환 성공", info: result});
+    } else {
+      return res.status(400).json({success:false, message:"해당 유저의 정보가 존재하지 않습니다."});
     }
-    return res.status(400).json({success:false, message:"해당 유저의 정보가 존재하지 않습니다."});
   });
 };
 

@@ -19,8 +19,8 @@ const createPost = (req, res) => {
   var score = req.body.score;
   var data = [user_id, title, memo, location, score];
   const createPost = postService.createPost(data, function(err, results){
-    if(results[0]) return res.status(201).json({success: true, message: "포스트 DB가 정상적으로 생성되었습니다."});
-    return res.status(400).json({success: false, message: "포스트 DB 생성에 실패하였습니다."});
+    if(results) return res.status(201).json({success: true, message: "포스트 DB가 정상적으로 생성되었습니다."});
+    else return res.status(400).json({success: false, message: "포스트 DB 생성에 실패하였습니다."});
   })
 }
 
