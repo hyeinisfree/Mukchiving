@@ -3,6 +3,14 @@ var db = require('../db');
 const { postService } = require('../services');
 var conn = db.init();
 
+const getPostId = (req, res) => {
+  var title = req.params.title;
+  const getPostId = postService.getPostId(title, function(err, results){
+    if(results[0]) return res.json({success:true, message:"포스트 아이디 반환 성공", post_id : results});
+    return res.status(400).json({success:false, message:"포스트 아이디 반환 실패"});
+  })
+}
+
 const userPost = (req, res) => {
   var user_id = req.params.id;
   const userPost = postService.userPost(user_id, function(err, results) {
@@ -48,6 +56,7 @@ const detailPost = (req, res) => {
 }
 
 module.exports = {
+  getPostId,
   userPost,
   createPost,
   detailPost
