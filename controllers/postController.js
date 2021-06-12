@@ -4,8 +4,12 @@ const { postService } = require('../services');
 var conn = db.init();
 
 const uploadImages = (req, res, next) => {
-  const profile_image = req.file;
-  return res.json({profile_image: profile_image.location});
+  const profile_images = req.files;
+  var location = [];
+  for(var i=0; i<profile_images.length; i++) {
+    location.push(profile_images[i].location);
+  }
+  return res.json({profile_images: location});
 };
 
 const getPostId = (req, res) => {
