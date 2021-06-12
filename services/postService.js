@@ -29,11 +29,21 @@ const userPost = function(user_id, callback){
   });
 };
 
-const createPost = function(data, callback) {
-  console.log(data);
-  var params = data;
-  var sql = 'insert into post(user_id, title, memo, location, score, created_at) values (?, ?, ?, ?, ?, now())';
-  conn.query(sql, params, function(err, results){
+const postImages = function(image_data, callback) {
+  var post_id = image_data.post_id;
+  var images = image_data.images
+  var sqls = "";
+  var sql = 'insert into post_images (post_id, image_url, num) values (?, ?, ?);';
+  for(var i=0; i<images.length; i++){
+    var arr = [];
+    arr.push(post_id);
+    arr.push(images[i]);
+    arr.push(i);
+    console.log(arr);
+    sqls += (mysql.format(sql, arr));
+  }
+  console.log(sqls);
+  conn.query(sqls, function(err, results){
     if(err) {
       callback(err);
       return;
@@ -42,10 +52,42 @@ const createPost = function(data, callback) {
   })
 }
 
+const createPost = function(data, callback) {
+  console.log(data);
+  var params1 = data;
+  var sql1 = 'insert into post(user_id, title, memo, location, score, created_at) values (?, ?, ?, ?, ?, now())';
+  conn.query(sql1, params1, function(err, results){
+    if(err) {
+      callback(err);
+      return;
+    }
+    var sql2 = 'select last_insert_id() as post_id';
+    conn.query(sql2, function(err, results){
+      if(err) {
+        callback(err);
+        return;
+      }
+      callback(null, results);
+    });
+  })
+}
+
 const detailPost = function(post_id, callback) {
   var params = [post_id];
   var sql = 'select * from post where post_id = ?';
   conn.query(sql, params, function(err, results){
+    if(err) {
+      callback(err);
+      return;
+    }
+    callback(null, results)
+  })
+}
+
+const deletePost = function(post_id, callback) {
+  var params = [post_id];
+  var sql = 'delete from post where post_id = ?';
+  conn.query(sql, params, function(err, results) {
     if(err) {
       callback(err);
       return;
@@ -71,5 +113,7 @@ module.exports = {
   userPost,
   createPost,
   detailPost,
+  deletePost,
+  postImages,
   profileImage
 }

@@ -29,16 +29,34 @@ const userPost = (req, res) => {
   });
 }
 
-const createPost = (req, res) => {
+const createPost = (req, res, next) => {
   var user_id = req.decoded.user_id;
   var title = req.body.title;
   var memo = req.body.memo;
-  var location = req.body.locatio;
+  var location = req.body.location;
   var score = req.body.score;
   var data = [user_id, title, memo, location, score];
-  const createPost = postService.createPost(data, function(err, results){
-    if(results) return res.status(201).json({success: true, message: "포스트 DB가 정상적으로 생성되었습니다."});
-    else return res.status(400).json({success: false, message: "포스트 DB 생성에 실패하였습니다."});
+  const createPost = postService.createPost(data, async function(err, results){
+    if(err) return res.status(400).json({success: false, message: "포스트 DB 생성에 실패하였습니다."});
+    if(results[0]) {
+      if(req.body.images) {
+        var images = req.body.images;
+        var post_id = results[0].post_id;
+        var image_data = {};
+        image_data.post_id = post_id;
+        image_data.images = images;
+        const postImages = await postService.postImages(image_data, function(err, results){
+          console.log(results);
+          if(err) {
+            const deletePost = postService.deletePost(post_id, function(err, results){
+              if(err) next(err);
+            })
+            return res.status(400).json({success: false, message: "포스트 이미지 DB 생성에 실패하였습니다."});
+          } 
+          return res.status(201).json({success: true, message: "포스트 DB 및 포스트 이미지 DB가 정상적으로 생성되었습니다."});
+        })
+      }
+    }
   })
 }
 
