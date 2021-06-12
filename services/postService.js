@@ -64,6 +64,18 @@ const getPostImages = function(post_id, callback) {
   })
 }
 
+const deletePostImages = function(post_id, callback) {
+  var params = [post_id];
+  var sql = 'delete from post_images where post_id = ?';
+  conn.query(sql, params, function(err, results){
+    if(err) {
+      callback(err);
+      return;
+    }
+    callback(null, results);
+  })
+}
+
 const createPost = function(data, callback) {
   console.log(data);
   var params1 = data;
@@ -120,10 +132,20 @@ const userProfile = function(user_id, callback) {
   })
 }
 
-const createTag = function(title, callback) {
-  var params = [title];
-  var sql = 'insert into tag(title) values (?)';
-  conn.query(sql, params, function(err, results){
+const createPostTag = function(tag_data, callback) {
+  var post_id = tag_data.post_id;
+  var tag = tag_data.tag
+  var sqls = "";
+  var sql = 'insert into post_tag(post_id, tag_id) values (?, ?);';
+  for(var i=0; i<tag.length; i++){
+    var arr = [];
+    arr.push(post_id);
+    arr.push(tag[i]);
+    console.log(arr);
+    sqls += (mysql.format(sql, arr));
+  }
+  console.log(sqls);
+  conn.query(sqls, function(err, results){
     if(err) {
       callback(err);
       return;
@@ -132,9 +154,29 @@ const createTag = function(title, callback) {
   })
 }
 
+const createTag = function(title, callback) {
+  var params1 = [title];
+  var sql1 = 'insert into tag(tag_title) values (?)';
+  conn.query(sql1, params1, function(err, results){
+    if(err) {
+      callback(err);
+      return;
+    }
+    var sql2 = 'select last_insert_id() as tag_id';
+    conn.query(sql2, function(err, results){
+      if(err) {
+        callback(err);
+        return;
+      }
+      callback(null, results);
+    });
+    callback(null, results);
+  })
+}
+
 const getTagByTitle = function(title, callback) {
   var params = [title];
-  var sql = 'select tag_id from tag where title = ?';
+  var sql = 'select tag_id from tag where tag_title = ?';
   conn.query(sql, params, function(err, results){
     if(err) {
       callback(err);
@@ -152,7 +194,9 @@ module.exports = {
   deletePost,
   getPostImages,
   createPostImages,
+  deletePostImages,
   userProfile,
+  createPostTag,
   createTag,
   getTagByTitle,
 }
