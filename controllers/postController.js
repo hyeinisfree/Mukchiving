@@ -3,6 +3,11 @@ var db = require('../db');
 const { postService } = require('../services');
 var conn = db.init();
 
+const uploadImages = (req, res, next) => {
+  const profile_image = req.file;
+  return res.json({profile_image: profile_image.location});
+};
+
 const getPostId = (req, res) => {
   var title = req.params.title;
   const getPostId = postService.getPostId(title, function(err, results){
@@ -58,6 +63,7 @@ const detailPost = (req, res) => {
 module.exports = {
   getPostId,
   userPost,
+  uploadImages,
   createPost,
   detailPost
 }

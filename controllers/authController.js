@@ -43,18 +43,19 @@ const login =  async (req, res, next) => {
 };
 
 const checkUsername = (req, res) => {
-  var username = req.body.username;
+  var username = req.params.username;
   const data = authService.checkUsername(username, function(err, data) {
     if(data) return res.status(400).json({success:false, message:"해당 닉네임이 이미 존재합니다."});
-    return res.json({success:true, message:"이 닉네임은 사용 가능합니다."});
+    else return res.json({success:true, message:"이 닉네임은 사용 가능합니다."});
   });
 };
 
 const checkId = (req, res) => {
-  var user_id = req.body.user_id;
+  var user_id = req.params.id;
   const data = authService.checkId(user_id, function(err, data) {
+    console.log(data);
     if(data) return res.status(400).json({success:false, message:"해당 아이디가 이미 존재합니다."});
-    return res.json({success:true, message:"이 아이디는 사용 가능합니다."});
+    else return res.json({success:true, message:"이 아이디는 사용 가능합니다."});
   }); 
 };
 
