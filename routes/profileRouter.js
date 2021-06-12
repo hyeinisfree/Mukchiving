@@ -6,6 +6,6 @@ const { verifyToken } = require('../middleware/auth');
 
 router.get('/get/:id', verifyToken, profileController.getProfile);
 router.patch('/update', verifyToken, profileController.updateProfile);
-router.get('/uploadImage', verifyToken, upload.single("profileImage"), profileController.uploadProfileImage);
+router.post('/uploadImage', verifyToken, upload.single("profileImage"), profileController.uploadProfileImage);
 
 module.exports = router;
