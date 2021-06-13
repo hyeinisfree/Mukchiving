@@ -16,6 +16,20 @@ const getPostIdByTitle = function(title, callback){
   });
 }
 
+const getUserPostImages = function(post_id, callback) {
+  var params = [post_id];
+  var sql = 'select * from post_images where post_id in (?)';
+
+  conn.query(sql, params, function(err, results){
+    if(err) {
+      callback(err);
+      return;
+    }
+    callback(null, results);
+    return;
+  })
+}
+
 const userPost = function(user_id, callback){
   var params = [user_id];
   var sql = 'select * from post where user_id = ?;';
@@ -238,8 +252,22 @@ const getFeedUserProfile = function(user_id, callback) {
   })
 }
 
+const getFeedPostTags = function(post_id, callback) {
+  var params = [post_id];
+  var sql = 'select * from tag where tag_id = (select tag_id from post_tag where post_id = ?);'
+  conn.query(sql, params, function(err, results){
+    if(err) {
+      callback(err);
+      return;
+    }
+    callback(null, results);
+    return;
+  })
+}
+
 module.exports = {
   getPostIdByTitle,
+  getUserPostImages,
   userPost,
   createPost,
   detailPost,
@@ -254,5 +282,6 @@ module.exports = {
   getPostTags,
   feedPost,
   getFeedPostImages,
-  getFeedUserProfile
+  getFeedUserProfile,
+  getFeedPostTags
 }
