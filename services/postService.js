@@ -169,14 +169,66 @@ const createTag = function(title, callback) {
         return;
       }
       callback(null, results);
+      return;
     });
+  })
+}
+
+const getPostTags = function(post_id, callback) {
+  var params = [post_id];
+  var sql = 'select * from tag where tag_id = (select tag_id from post_tag where post_id = ?);'
+  conn.query(sql, params, function(err, results){
+    if(err) {
+      callback(err);
+      return;
+    }
+    callback(null, results);
+    return;
+  })
+}
+
+const getTagIdByTitle = function(title, callback) {
+  var params = [title];
+  var sql = 'select tag_id from tag where tag_title = ?';
+  conn.query(sql, params, function(err, results){
+    if(err) {
+      callback(err);
+      return;
+    }
     callback(null, results);
   })
 }
 
-const getTagByTitle = function(title, callback) {
-  var params = [title];
-  var sql = 'select tag_id from tag where tag_title = ?';
+const feedPost = function(user_id, callback) {
+  var params = [user_id];
+  var sql = 'select * from post where user_id in (select follow_receiver from follow where follow_sender = ?)';
+  conn.query(sql, params, function(err, results){
+    if(err) {
+      callback(err);
+      return;
+    }
+    callback(null, results);
+    return;
+  })
+}
+
+const getFeedPostImages = function(post_id, callback) {
+  var params = [post_id];
+  var sql = 'select * from post_images where post_id in (?)';
+
+  conn.query(sql, params, function(err, results){
+    if(err) {
+      callback(err);
+      return;
+    }
+    callback(null, results);
+    return;
+  })
+}
+
+const getFeedUserProfile = function(user_id, callback) {
+  var params = [user_id];
+  var sql = 'select user_id, profile_image from profile where user_id in (?)';
   conn.query(sql, params, function(err, results){
     if(err) {
       callback(err);
@@ -198,5 +250,9 @@ module.exports = {
   userProfile,
   createPostTag,
   createTag,
-  getTagByTitle,
+  getTagIdByTitle,
+  getPostTags,
+  feedPost,
+  getFeedPostImages,
+  getFeedUserProfile
 }

@@ -9,5 +9,7 @@ router.get('/user/:id', verifyToken, postController.userPost);
 router.get('/uploadImages', verifyToken, upload.array("images"), postController.uploadImages);
 router.post('/create', verifyToken, postController.createPost);
 router.get('/detail/:id', verifyToken, postController.detailPost);
+router.post('/createTag', verifyToken, postController.createTag);
+router.get('/feed', verifyToken, postController.feedPost);
 
 module.exports = router;
