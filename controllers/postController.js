@@ -1,6 +1,5 @@
 var express = require('express');
 var db = require('../db');
-const { post } = require('../routes');
 const { postService } = require('../services');
 var conn = db.init();
 
