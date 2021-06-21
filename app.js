@@ -1,21 +1,18 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-
+const createError = require('http-errors');
+const express = require('express');
+const dotenv = require('dotenv');
+const logger = require('morgan');
+const cors = require("cors");
+const path = require('path');
 const passport = require('passport');
-const passportConfig = require('./config/passport');
 
+dotenv.config();
+const passportConfig = require('./config/passport');
 const routes = require('./routes');
 const { connect } = require('./db');
 const { RequestHeaderFieldsTooLarge } = require('http-errors');
 
 const app = express();
-
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -24,15 +21,28 @@ app.use(express.urlencoded({ extended: false }));
 app.use(passport.initialize());
 passportConfig();
 
-app.use(express.static(path.join(__dirname, 'public')));
+const prod = process.env.NODE_ENV === "production";
 
+if (prod) {
+  app.enable("trust proxy");
+  app.use(logger("combined"));
+  app.use(helmet({ contentSecurityPolicy: false }));
+  app.use(hpp());
+} else {
+  app.use(logger("dev"));
+  app.use(
+    cors({
+      origin: true,
+      credentials: true,
+    })
+  );
+}
+
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/v1', routes);
-
-app.get('/test', (req, res) => {
-  return res.json("api test 성공");
-});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

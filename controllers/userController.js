@@ -5,6 +5,12 @@ const conn = db.init();
 
 db.connect(conn);
 
-module.exports = {
+const userTest = (req, res) => {
+  var list = userService.userTest();
+  console.log(list);
+  return res.json({list: list});
+}
 
+module.exports = {
+  userTest
 }
