@@ -1,12 +1,13 @@
 const mysql = require('mysql');
-const db_config = require('./config/db-config.json')
+const env = process.env.NODE_ENV || "development";
+const config = require("./config/config")[env];
 
 const db_info = {
-  host : db_config.host,
-  user : db_config.user,
-  password : db_config.password,
-  port : db_config.port,
-  database : db_config.database,
+  host : config.host,
+  user : config.username,
+  password : config.password,
+  port : config.port,
+  database : config.database,
   multipleStatements: true,
   dateStirng: 'date'
 }

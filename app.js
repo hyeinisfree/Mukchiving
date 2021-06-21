@@ -7,19 +7,27 @@ const path = require('path');
 const passport = require('passport');
 
 dotenv.config();
-const passportConfig = require('./config/passport');
+const { sequelize } = require("./models");
+const passportConfig = require('./config/passport-config');
 const routes = require('./routes');
-const { connect } = require('./db');
 const { RequestHeaderFieldsTooLarge } = require('http-errors');
 
 const app = express();
+
+sequelize
+  .sync()
+  .then(() => {
+    console.log("DB 연결 성공");
+  })
+  .catch(console.error);
+  
+app.use(passport.initialize());
+passportConfig();
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use(passport.initialize());
-passportConfig();
 
 const prod = process.env.NODE_ENV === "production";
 
