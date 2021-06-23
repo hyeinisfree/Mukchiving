@@ -8,9 +8,15 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto-js');
 const axios = require('axios');
 
+const { Op } = require("sequelize");
+const { sequelize } = require("../models");
+const User = require("../models/user");
+const Profile = require("../models/profile");
+
 db.connect(conn);
 
 const { authService } = require('../services');
+const { WorkDocs } = require('aws-sdk');
 
 const login =  async (req, res, next) => {
   try {
@@ -132,6 +138,44 @@ const sendAuthNumber =  async (req, res) => {
   else return res.status(resultCode).json({success: false, message: "인증 번호 전송 실패"});
 };
 
+// const signup =  async (req, res) => {
+//   console.log(req.body);
+//   var user_id = req.body.user_id;
+//   var password = req.body.password;
+//   var phone = req.body.phone;
+
+//   var username = req.body.username;
+
+//   var hash = await bcrypt.hash(password, saltRounds);
+//   var sql1 = 'insert into users (user_id, password, phone) values (?, ?, ?)';
+//   var params1 = [user_id, hash, phone];
+
+//   conn.query(sql1, params1, async function (err, rows, fields) {
+//     if(err) {
+//       return res.status(400).json({success: false, message: "회원 DB 생성에 실패하였습니다."});
+//     }
+//     console.log("user table 1 record inserted");
+
+//     var sql2 = 'insert into profiles (id, username) values (?, ?)';
+//     var params2 = [user_id, username];
+//     await conn.query(sql2, params2, function (err, rows, fiedls) {
+//       if(err) {
+//         var sql3 = 'delete from users where user_id = ?';
+//         var params3 = [user_id];
+//         conn.query(sql3, params3, function (err, rows, fiedls) {
+//           if(err) {
+//             return next(err);
+//           }
+//           console.log("user table 1 record deleted");
+//         })
+//         return res.status(400).json({success: false, message: "프로필 DB 생성에 실패하였습니다."});
+//       }
+//       console.log("profile table 1 record inserted");
+//       return res.status(201).json({success: true, message: "회원 DB 및 프로필 DB가 정상적으로 생성되었습니다."});
+//     });
+//   }); 
+// };
+
 const signup =  async (req, res) => {
   console.log(req.body);
   var user_id = req.body.user_id;
@@ -141,33 +185,30 @@ const signup =  async (req, res) => {
   var username = req.body.username;
 
   var hash = await bcrypt.hash(password, saltRounds);
-  var sql1 = 'insert into user (user_id, password, phone) values (?, ?, ?)';
-  var params1 = [user_id, hash, phone];
 
-  conn.query(sql1, params1, async function (err, rows, fields) {
-    if(err) {
-      return res.status(400).json({success: false, message: "회원 DB 생성에 실패하였습니다."});
-    }
-    console.log("user table 1 record inserted");
+  User.create({user_id:user_id, password:hash, phone:phone})
+  .then(async function(result) {
+    console.log(result);
+    console.log("users table 1 record inserted");
 
-    var sql2 = 'insert into profile (user_id, username) values (?, ?)';
-    var params2 = [user_id, username];
-    await conn.query(sql2, params2, function (err, rows, fiedls) {
-      if(err) {
-        var sql3 = 'delete from user where user_id = ?';
-        var params3 = [user_id];
-        conn.query(sql3, params3, function (err, rows, fiedls) {
-          if(err) {
-            return next(err);
-          }
-          console.log("user table 1 record deleted");
-        })
-        return res.status(400).json({success: false, message: "프로필 DB 생성에 실패하였습니다."});
-      }
+    await Profile.create({id:result.id, username:username})
+    .then(function(result) {
+      console.log(result);
       console.log("profile table 1 record inserted");
+
       return res.status(201).json({success: true, message: "회원 DB 및 프로필 DB가 정상적으로 생성되었습니다."});
+    }).catch(function(err) {
+      User.destroy({where: {id:id}})
+      .then(function(result) {
+        console.log("user table 1 record deleted");
+        return res.status(400).json({success: false, message: "프로필 DB 생성에 실패하였습니다."});
+      }).catch(function(err) {
+        return next(err);
+      });
     });
-  }); 
+  }).catch(function(err) {
+    return res.status(400).json({success: false, message: "회원 DB 생성에 실패하였습니다."});
+  });
 };
 
 const check =  (req, res) => {

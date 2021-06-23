@@ -3,17 +3,22 @@ var db = require('../db');
 var conn = db.init();
 db.connect(conn);
 
-const checkFollow = function(data, callback) {
-  var params = data;
-  var sql = 'select * from follow where follow_receiver = ? and follow_sender = ?';
-  conn.query(sql, params, function(err, results){
-    if(err) {
-      callback(err);
-      return;
+const { Op } = require("sequelize");
+const { sequelize } = require("../models");
+const Follow = require("../models/follow");
+
+const checkFollow = function(sender_id, receiver_id) {
+  try {
+    const follow = Follow.findOne({
+      where: {follow_sender: sender_id, follow_receiver: receiver_id},
+    });
+    if (!follow) {
+      return null;
     }
-    callback(null, results);
-    return;
-  })
+    return follow.getAll();
+  } catch (error) {
+    return error;
+  }
 }
 
 const createFollow = function(data, callback) {
