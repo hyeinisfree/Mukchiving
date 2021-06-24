@@ -8,6 +8,5 @@ router.get('/checkUsername/:username', authController.checkUsername);
 router.get('/checkId/:id', authController.checkId);
 router.post('/sendAuthNumber', authController.sendAuthNumber);
 router.post('/signup', authController.signup);
-router.get('/check', verifyToken ,authController.check);
 
 module.exports = router;

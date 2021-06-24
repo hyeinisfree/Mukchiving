@@ -1,6 +1,4 @@
 var express = require('express');
-var db = require('../db');
-var conn = db.init();
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const passport = require('passport');
@@ -12,8 +10,6 @@ const { Op } = require("sequelize");
 const { sequelize } = require("../models");
 const User = require("../models/user");
 const Profile = require("../models/profile");
-
-db.connect(conn);
 
 const { authService } = require('../services');
 const { WorkDocs } = require('aws-sdk');
@@ -50,19 +46,25 @@ const login =  async (req, res, next) => {
 
 const checkUsername = (req, res) => {
   var username = req.params.username;
-  const data = authService.checkUsername(username, function(err, data) {
-    if(data) return res.status(400).json({success:false, message:"해당 닉네임이 이미 존재합니다."});
+  Profile.findOne({where: {username: username}})
+  .then(profile => {
+    if(profile != null) return res.status(400).json({success:false, message:"해당 닉네임이 이미 존재합니다."});
     else return res.json({success:true, message:"이 닉네임은 사용 가능합니다."});
-  });
+  }).catch(err => {
+    return next(err);
+  })
 };
 
-const checkId = (req, res) => {
+const checkId = (req, res) =>  {
   var user_id = req.params.id;
-  const data = authService.checkId(user_id, function(err, data) {
-    if(data) return res.status(400).json({success:false, message:"해당 아이디가 이미 존재합니다."});
+  User.findOne({where: {user_id: user_id}})
+  .then(user => {
+    if(user != null) return res.status(400).json({success:false, message:"해당 아이디가 이미 존재합니다."});
     else return res.json({success:true, message:"이 아이디는 사용 가능합니다."});
-  }); 
-};
+  }).catch(err => {
+    return next(err);
+  });
+}
 
 const sendAuthNumber =  async (req, res) => {
   var phone = req.body.phone;
@@ -138,50 +140,11 @@ const sendAuthNumber =  async (req, res) => {
   else return res.status(resultCode).json({success: false, message: "인증 번호 전송 실패"});
 };
 
-// const signup =  async (req, res) => {
-//   console.log(req.body);
-//   var user_id = req.body.user_id;
-//   var password = req.body.password;
-//   var phone = req.body.phone;
-
-//   var username = req.body.username;
-
-//   var hash = await bcrypt.hash(password, saltRounds);
-//   var sql1 = 'insert into users (user_id, password, phone) values (?, ?, ?)';
-//   var params1 = [user_id, hash, phone];
-
-//   conn.query(sql1, params1, async function (err, rows, fields) {
-//     if(err) {
-//       return res.status(400).json({success: false, message: "회원 DB 생성에 실패하였습니다."});
-//     }
-//     console.log("user table 1 record inserted");
-
-//     var sql2 = 'insert into profiles (id, username) values (?, ?)';
-//     var params2 = [user_id, username];
-//     await conn.query(sql2, params2, function (err, rows, fiedls) {
-//       if(err) {
-//         var sql3 = 'delete from users where user_id = ?';
-//         var params3 = [user_id];
-//         conn.query(sql3, params3, function (err, rows, fiedls) {
-//           if(err) {
-//             return next(err);
-//           }
-//           console.log("user table 1 record deleted");
-//         })
-//         return res.status(400).json({success: false, message: "프로필 DB 생성에 실패하였습니다."});
-//       }
-//       console.log("profile table 1 record inserted");
-//       return res.status(201).json({success: true, message: "회원 DB 및 프로필 DB가 정상적으로 생성되었습니다."});
-//     });
-//   }); 
-// };
-
 const signup =  async (req, res) => {
   console.log(req.body);
   var user_id = req.body.user_id;
   var password = req.body.password;
   var phone = req.body.phone;
-
   var username = req.body.username;
 
   var hash = await bcrypt.hash(password, saltRounds);
@@ -211,15 +174,10 @@ const signup =  async (req, res) => {
   });
 };
 
-const check =  (req, res) => {
-  res.json(req.decoded);
-};
-
 module.exports = {
   login,
   checkUsername,
   checkId,
   sendAuthNumber,
   signup,
-  check,
 };

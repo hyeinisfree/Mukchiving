@@ -1,21 +1,25 @@
 var express = require('express');
 
+const { Op } = require("sequelize");
+const { sequelize } = require("../models");
+const Follow = require("../models/follow");
+const User = require("../models/user");
+const Profile = require("../models/profile");
+
 var { userService, followService } = require('../services');
 
-const checkFollow = (req, res) => {
+const checkFollow = (req, res, next) => {
   var receiver = req.params.id;
-  var sender = req.decoded.id;
-  var data = [receiver, sender];
+  var sender = req.decoded.user_id;
+  console.log(receiver, sender);
 
-  const result = followService.checkFollow(sender, receiver);
-
-  // const checkFollow = followService.checkFollow(data, function(err, results){
-  //   if(results[0]) {
-  //     return res.json({check: true, message: "팔로우 중인 사용자입니다."});
-  //   } else {
-  //     return res.json({check: false, message: "팔로우 중인 사용자가 아닙니다."});
-  //   }
-  // })
+  Follow.findOne({where: {follow_receiver: receiver, follow_sender: sender}})
+  .then(follow => {
+    if(follow != null) return res.json({follow: true, message: "해당 사용자를 팔로우 중입니다."});
+    else return res.json({follow: false, message: "해당 사용자를 팔로우 중이지 않습니다."});
+  }).catch(err => {
+    return next(err);
+  });
 }
 
 // follow_receiver, follow_sender, created_at, accept
