@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 var express = require('express');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
@@ -10,6 +12,7 @@ const { Op } = require("sequelize");
 const { sequelize } = require("../models");
 const User = require("../models/user");
 const Profile = require("../models/profile");
+const Token = require("../models/profile");
 
 const { authService } = require('../services');
 const { WorkDocs } = require('aws-sdk');
@@ -30,12 +33,26 @@ const login =  async (req, res, next) => {
           return res.send(err);
         }
 		    // 클라이언트에게 JWT생성 후 반환
-        const token = jwt.sign(
-          { user_id : user.user_id },
-          'jwt-secret-key',
-          {expiresIn: "7d"}
+        const accessToken = jwt.sign(
+          { id: user.id, user_id : user.user_id },
+          process.env.ACCESS_TOKEN_SECRET,
+          {expiresIn : "1h"}
         );
-        return res.json({ success : true, message : "로그인 성공", token });
+        const refreshToken = jwt.sign(
+          { },
+          process.env.REFRESH_TOKEN_SECRET,
+          {expiresIn : "14d"}
+        );
+        
+        Token.create({id:user.id, token:refreshToken})
+        .then(function(result) {
+          console.log(result);
+          console.log("tokens table 1 record inserted");
+        }).catch(function(err) {
+          return res.status(400).json({success: false, message: "회원 DB 생성에 실패하였습니다."});
+        });
+
+        return res.json({ success : true, message : "로그인 성공", accessToken, refreshToken });
       });
     })(req, res);
   } catch (e) {

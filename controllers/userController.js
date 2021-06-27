@@ -11,6 +11,12 @@ const userTest = (req, res) => {
   return res.json({list: list});
 }
 
+const info = (req, res) => {
+  console.log(req.decoded)
+  return res.json(req.decoded);
+};
+
 module.exports = {
-  userTest
+  userTest,
+  info
 }
