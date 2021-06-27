@@ -44,13 +44,24 @@ const login =  async (req, res, next) => {
           {expiresIn : "14d"}
         );
         
-        Token.create({id:user.id, token:refreshToken})
-        .then(function(result) {
-          console.log(result);
-          console.log("tokens table 1 record inserted");
-        }).catch(function(err) {
-          return res.status(400).json({success: false, message: "회원 DB 생성에 실패하였습니다."});
-        });
+        const oldToken = Token.findOne({where: {id:user.id}});
+        if(!oldToken) {
+          Token.create({id:user.id, token:refreshToken})
+          .then(function(result) {
+            console.log(result);
+            console.log("tokens table 1 record inserted");
+          }).catch(function(err) {
+            return res.status(400).json({success: false, message: "회원 DB 생성에 실패하였습니다."});
+          });
+        } else {
+          Token.update({token: refreshToken}, {where: {id: user.id}})
+          .then(function(result) {
+            console.log(result);
+            console.log("tokens table 1 record updated");
+          }).catch(function(err) {
+            return res.status(400).json({success: false, message: "회원 DB 생성에 실패하였습니다."});
+          });
+        }
 
         return res.json({ success : true, message : "로그인 성공", accessToken, refreshToken });
       });
