@@ -3,8 +3,6 @@ const conn = db.init();
 
 db.connect(conn);
 
-const {userModel} = require('../models');
-
 const userPrivacy = function(user_id, callback) {
   var params = [user_id];
   var sql = 'select privacy from user where user_id = ?';
@@ -18,12 +16,6 @@ const userPrivacy = function(user_id, callback) {
   })
 }
 
-const userTest = function() {
-  var list = userModel.selectAll();
-  return list;
-}
-
 module.exports = {
   userPrivacy,
-  userTest
 }

@@ -7,20 +7,6 @@ const { Op } = require("sequelize");
 const { sequelize } = require("../models");
 const Follow = require("../models/follow");
 
-const checkFollow = function(sender_id, receiver_id) {
-  try {
-    const follow = Follow.findOne({
-      where: {follow_sender: sender_id, follow_receiver: receiver_id},
-    });
-    if (!follow) {
-      return null;
-    }
-    return follow.getAll();
-  } catch (error) {
-    return error;
-  }
-}
-
 const createFollow = function(data, callback) {
   var params = data;  
   var sql = 'insert into follow(follow_receiver, follow_sender, created_at, accept) values (?, ?, now(), ?)';
@@ -100,7 +86,6 @@ const followingInfo = function(array, callback) {
 }
 
 module.exports = {
-  checkFollow,
   createFollow,
   unfollow,
   followerList,

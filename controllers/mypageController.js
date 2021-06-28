@@ -6,12 +6,13 @@ var { mypageService } = require('../services');
 
 // 프로필 사진, 닉네임, 소개글, 포스트 수, 팔로잉 수, 팔로워 수 GET
 const info = (req, res) => {
-  var user_id = req.params.id;
-  console.log(user_id);
-  const info = mypageService.getInfo(user_id, function(err, results) {
-    if(results[0]) {
+  var id = req.params.id;
+  console.log(id);
+  const info = mypageService.getInfo(id, function(err, results) {
+    if(results[0][0]) {
+      console.log(results[0]);
       const result = {
-        user_id : results[0][0].user_id,
+        user_id : results[0][0].id,
         username : results[0][0].username,
         profile_image : results[0][0].profile_image,
         content : results[0][0].content,

@@ -11,6 +11,7 @@ exports.verifyToken = (req, res, next) => {
     return next();
   } catch (err) {
     if (err.name == 'TokenExpiredError') {
+      console.log(req.decoded);
       return res.status(419).json({success: false, message : "token 만료"});
     }
     return res.status(401).json({success: false, message : "token이 유효하지 않습니다."});

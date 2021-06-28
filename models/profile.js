@@ -13,7 +13,7 @@ module.exports = class Profile extends Model {
           references: {
           model: 'users',
           key: 'id',
-        },
+          },
         },
         username: {
           type: DataTypes.STRING(20),

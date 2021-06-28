@@ -5,10 +5,14 @@ const conn = db.init();
 
 db.connect(conn);
 
-const userTest = (req, res) => {
-  var list = userService.userTest();
-  console.log(list);
-  return res.json({list: list});
+const { Op } = require("sequelize");
+const { sequelize } = require("../models");
+const User = require("../models/user");
+const Profile = require("../models/profile");
+
+const getAll = async (req, res) => {
+  const allUser = await User.findAll();
+  return res.json({allUser : allUser});
 }
 
 const info = (req, res) => {
@@ -17,6 +21,6 @@ const info = (req, res) => {
 };
 
 module.exports = {
-  userTest,
+  getAll,
   info
 }
