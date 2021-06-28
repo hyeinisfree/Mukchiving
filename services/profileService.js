@@ -3,9 +3,9 @@ var db = require('../db');
 var conn = db.init();
 db.connect(conn);
 
-const getProfile = function(user_id, callback){
-  var params = [user_id];
-  var sql = 'select * from profile where user_id = ?;';
+const getProfile = function(id, callback){
+  var params = [id];
+  var sql = 'select * from profiles where id = ?;';
   conn.query(sql, params, function (err, results) {
     if(err) {
       callback(err);
@@ -18,7 +18,7 @@ const getProfile = function(user_id, callback){
 
 const updateProfile = function(data, callback){
   var params = data;
-  var sql = 'update profile set username = ?, content = ?, profile_image = ? where user_id = ?;';
+  var sql = 'update profiles set username = ?, content = ?, profile_image = ? where id = ?;';
   conn.query(sql, params, function (err, results) {
     if(err) {
       callback(err);

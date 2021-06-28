@@ -22,8 +22,8 @@ const getPostIdByTitle = (req, res) => {
 }
 
 const userPost = (req, res) => {
-  var user_id = req.params.id;
-  const userPost = postService.userPost(user_id, async function(err, results) {
+  var id = req.params.id;
+  const userPost = postService.userPost(id, async function(err, results) {
     if(results[0]) {
       var user_data = {};
       user_data.post = results;

@@ -6,24 +6,33 @@ db.connect(conn);
 
 var { authService, profileService } = require('../services');
 
+const { Op } = require("sequelize");
+const { sequelize } = require("../models");
+const User = require("../models/user");
+const Profile = require("../models/profile");
+
 const getProfile = (req, res) => {
-  var user_id = req.params.id;
-  const profile = profileService.getProfile(user_id, function(err, results) {
-    if(results[0]) return res.json({success:true, message:"사용자 프로필 반환 성공", profile : results});
-    return res.status(400).json({success:false, message:"해당 사용자의 프로필이 없습니다."});
-  });
+  var id = req.params.id;
+
+  Profile.findOne({where: {id: id}})
+  .then(profile => {
+    if(profile != null) return res.json({success:true, message:"사용자 프로필 반환 성공", profile : profile});
+    else return res.status(400).json({success:false, message:"해당 사용자의 프로필이 없습니다."});
+  }).catch(err => {
+    return next(err);
+  })
 };
 
 const updateProfile = (req, res, next) => {
-  var user_id = req.decoded.user_id;
+  var id = req.decoded.id;
   
-  const profile = profileService.getProfile(user_id, async function(err, results) {
+  const profile = profileService.getProfile(id, async function(err, results) {
     if(results[0]) {
       var data = [];
       data.push(results[0].username);
       data.push(results[0].content);
       data.push(results[0].profile_image);
-      data.push(user_id);
+      data.push(id);
 
       if(req.body.username) {
         data[0] = req.body.username;

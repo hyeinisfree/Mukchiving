@@ -15,7 +15,6 @@ const Profile = require("../models/profile");
 const Token = require("../models/profile");
 
 const { authService } = require('../services');
-const { WorkDocs } = require('aws-sdk');
 
 const login =  async (req, res, next) => {
   try {
