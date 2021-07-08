@@ -10,15 +10,16 @@ const info = (req, res) => {
   console.log(id);
   const info = mypageService.getInfo(id, function(err, results) {
     if(results[0][0]) {
-      console.log(results[0]);
+      console.log(results);
       const result = {
-        user_id : results[0][0].id,
-        username : results[0][0].username,
-        profile_image : results[0][0].profile_image,
-        content : results[0][0].content,
-        post_count : results[1][0].post_count,
-        follower : results[2][0].follower,
-        following : results[3][0].following,
+        id : results[1][0].id,
+        user_id : results[0][0].user_id,
+        username : results[1][0].username,
+        profile_image : results[1][0].profile_image,
+        content : results[1][0].content,
+        post_count : results[2][0].post_count,
+        follower : results[3][0].follower,
+        following : results[4][0].following,
       };
       return res.json({success:true, message:"해당 유저 정보 반환 성공", info: result});
     } else {

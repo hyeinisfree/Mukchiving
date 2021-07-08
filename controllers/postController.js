@@ -4,13 +4,13 @@ const { postService } = require('../services');
 var conn = db.init();
 
 const uploadImages = (req, res, next) => {
-  const profile_images = req.files;
-  console.log(profile_images);
+  const post_images = req.files;
+  console.log(post_images);
   var location = [];
-  for(var i=0; i<profile_images.length; i++) {
-    location.push(profile_images[i].location);
+  for(var i=0; i<post_images.length; i++) {
+    location.push(post_images[i].location);
   }
-  return res.json({profile_images: location});
+  return res.json({post_images: location});
 };
 
 const getPostIdByTitle = (req, res) => {
@@ -44,14 +44,17 @@ const userPost = (req, res) => {
 }
 
 const createPost = (req, res, next) => {
-  var user_id = req.decoded.user_id;
+  var user_id = req.decoded.id;
   var title = req.body.title;
   var memo = req.body.memo;
   var location = req.body.location;
   var score = req.body.score;  
   var data = [user_id, title, memo, location, score];
   const createPost = postService.createPost(data, async function(err, results){
-    if(err) return res.status(400).json({success: false, message: "포스트 DB 생성에 실패하였습니다."});
+    if(err) {
+      console.log(err);
+      return res.status(400).json({success: false, message: "포스트 DB 생성에 실패하였습니다."});
+    } 
     if(results[0]) {
       if(req.body.images || req.body.tag) {
         if(req.body.images && !req.body.tag) {

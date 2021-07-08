@@ -47,12 +47,11 @@ const createPostImages = function(image_data, callback) {
   var post_id = image_data.post_id;
   var images = image_data.images
   var sqls = "";
-  var sql = 'insert into post_images (post_id, image_url, num) values (?, ?, ?);';
+  var sql = 'insert into post_images (post_id, image_url) values (?, ?);';
   for(var i=0; i<images.length; i++){
     var arr = [];
     arr.push(post_id);
     arr.push(images[i]);
-    arr.push(i);
     console.log(arr);
     sqls += (mysql.format(sql, arr));
   }
@@ -93,7 +92,7 @@ const deletePostImages = function(post_id, callback) {
 const createPost = function(data, callback) {
   console.log(data);
   var params1 = data;
-  var sql1 = 'insert into post(user_id, title, memo, location, score, created_at) values (?, ?, ?, ?, ?, now())';
+  var sql1 = 'insert into posts(user_id, title, memo, location, score, created_at, updated_at) values (?, ?, ?, ?, ?, now(), now())';
   conn.query(sql1, params1, function(err, results){
     if(err) {
       callback(err);
@@ -112,7 +111,7 @@ const createPost = function(data, callback) {
 
 const detailPost = function(post_id, callback) {
   var params = [post_id];
-  var sql = 'select * from post where post_id = ?';
+  var sql = 'select * from posts where id = ?';
   conn.query(sql, params, function(err, results){
     if(err) {
       callback(err);
@@ -124,7 +123,7 @@ const detailPost = function(post_id, callback) {
 
 const deletePost = function(post_id, callback) {
   var params = [post_id];
-  var sql = 'delete from post where post_id = ?';
+  var sql = 'delete from posts where id = ?';
   conn.query(sql, params, function(err, results) {
     if(err) {
       callback(err);
