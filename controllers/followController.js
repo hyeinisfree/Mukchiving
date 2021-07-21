@@ -25,15 +25,21 @@ const checkFollow = (req, res, next) => {
 // follow_receiver, follow_sender, created_at, accept
 const createFollow = (req, res) => {
   var receiver = req.params.id;
-  var sender = req.decoded.user_id;
-
+  var sender = req.decoded.id;
+  console.log(req.decoded.id)
   const userPrivacy = userService.userPrivacy(receiver, function(err, results){
     if(err) return;
     if(results[0]) {
+      console.log(results)
       var accept = results[0].privacy;
       var data = [receiver, sender, accept];
+      console.log(data)
       const createFollow = followService.createFollow(data, function(err, results){
-        if(err) return;
+        console.log(results)
+        if(err) {
+          console.log(err);
+          return;
+        };
         if(results) return res.json({success: true, message: "팔로우 DB가 정상적으로 생성되었습니다."});
         return res.status(400).json({success: false, message: "팔로우 DB 생성에 실패하였습니다."});
       })

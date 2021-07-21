@@ -9,7 +9,7 @@ const Follow = require("../models/follow");
 
 const createFollow = function(data, callback) {
   var params = data;  
-  var sql = 'insert into follow(follow_receiver, follow_sender, created_at, accept) values (?, ?, now(), ?)';
+  var sql = 'insert into follows(follow_receiver, follow_sender, created_at, updated_at, accept) values (?, ?, now(), now(), ?)';
   conn.query(sql, params, function(err, results){
     if(err) {
       callback(err);
